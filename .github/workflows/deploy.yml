@@ -3,8 +3,9 @@ on:
   push:
     branches: [main]
 
+# Явно даем права на запись
 permissions:
-  contents: write # Явно даем права на запись
+  contents: write
 
 jobs:
   deploy:
@@ -14,12 +15,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-
       - run: npm install
       - run: npm run build
-
       - uses: peaceiris/actions-gh-pages@v3
         with:
-          deploy_key: ${{ secrets.GH_PAT }} # Используем PAT вместо стандартного токена
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Стандартный токен
           publish_dir: ./dist
-          force_orphan: true # Полная перезапись ветки
+          publish_branch: gh-pages
+          force_orphan: true
