@@ -21,6 +21,9 @@ const sleepSlice = createSlice({
         state.push({ startTime: now, endTime: null, duration: null });
       }
     },
+    setSleeps: (state, action) => {
+      return action.payload;
+    }
   },
 });
 
@@ -28,5 +31,5 @@ function calculateDuration(start: string, end: string): number {
   return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
 }
 
-export const { toggleSleepEntry } = sleepSlice.actions;
+export const { toggleSleepEntry, setSleeps } = sleepSlice.actions;
 export default sleepSlice.reducer;

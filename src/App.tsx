@@ -1,21 +1,32 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleFeedingEntry } from './features/feeding/feedingSlice';
-import { toggleSleepEntry } from './features/sleep/sleepSlice';
+import { toggleFeedingEntry, setFeedings } from './features/feeding/feedingSlice';
+import { toggleSleepEntry, setSleeps } from './features/sleep/sleepSlice';
 import './App.css';
-import type { FeedingEntry } from './features/feeding/feedingSlice';
-import type { SleepEntry } from './features/sleep/sleepSlice';
 import type { RootState } from './app/store';
+import {clearValue, loadState} from './utils/localStorage';
+import { useEffect } from 'react';
 
 function App() {
   const dispatch = useDispatch();
+  const feedingEntries = useSelector((state: RootState) => state.feeding);
+  const sleepEntries = useSelector((state: RootState) => state.sleep);
 
-  const feedingEntries: FeedingEntry[] = useSelector<RootState, RootState['feeding']>(
-    (state) => state.feeding
-  );
-  
-  const sleepEntries: SleepEntry[] = useSelector<RootState, RootState['sleep']>(
-    (state) => state.sleep
-  );
+  useEffect(() => {
+    const savedState = loadState();
+    dispatch(setFeedings(savedState.feeding));
+    dispatch(setSleeps(savedState.sleep));
+  }, [dispatch]);
+
+  const clearFeedingsHandler = () => {
+    const updatedFeedings = clearValue('feeding');
+    dispatch(setFeedings(updatedFeedings));
+  };
+
+  const clearSleepsHandler = () => {
+    const updatedSleeps = clearValue('sleep');
+    dispatch(setSleeps(updatedSleeps));
+  };
+
 
   return (
     <div className="App">
@@ -26,6 +37,7 @@ function App() {
             ? 'Завершить кормление'
             : 'Начать кормление'}
         </button>
+        <button onClick={clearFeedingsHandler}>Сбросить кормление</button>
         <ul>
           {feedingEntries.map((entry, i) => (
             <li key={i}>
@@ -43,6 +55,7 @@ function App() {
             ? 'Завершить сон'
             : 'Начать сон'}
         </button>
+        <button onClick={clearSleepsHandler}>Сбросить сон</button>
         <ul>
           {sleepEntries.map((entry, i) => (
             <li key={i}>

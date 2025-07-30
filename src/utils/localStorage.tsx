@@ -1,42 +1,43 @@
-// 📁 src/utils/localStorage.ts
 import { FeedingEntry } from '../features/feeding/feedingSlice';
 import { SleepEntry } from '../features/sleep/sleepSlice';
 
-// 🔹 Типизация структуры сохраняемого состояния
-interface AppState {
+// Общий тип для состояния
+export interface AppState {
   feeding: FeedingEntry[];
   sleep: SleepEntry[];
 }
 
-// 🔹 Загрузка данных из localStorage
-export const loadState = (): AppState | undefined => {
+export const saveState = (state: AppState) => {
   try {
-    const serialized = localStorage.getItem('babyCareTracker');
-    if (!serialized) return undefined;
-
-    const parsedState = JSON.parse(serialized);
-
-    // 🔸 Дополнительная проверка структуры данных
-    if (
-      Array.isArray(parsedState?.feeding) &&
-      Array.isArray(parsedState?.sleep)
-    ) {
-      return parsedState;
-    }
-
-    console.warn('❌ Поврежденные данные в localStorage');
-    return undefined;
-  } catch (error) {
-    console.error('Error loading state:', error);
-    return undefined;
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem('babyCareTracker', serializedState);
+  } catch (err) {
+    console.error("Failed to save state:", err);
   }
 };
 
-// 🔹 Сохранение данных в localStorage
-export const saveState = (state: AppState): void => {
+export const loadState = (): AppState => {
   try {
-    localStorage.setItem('babyCareTracker', JSON.stringify(state));
-  } catch (error) {
-    console.error('Error saving state:', error);
+    const serializedState = localStorage.getItem('babyCareTracker');
+    if (serializedState === null) {
+      return {
+        feeding: [],
+        sleep: []
+      };
+    }
+    return JSON.parse(serializedState) as AppState;
+  } catch (err) {
+    console.error("Failed to load state:", err);
+    return {
+      feeding: [],
+      sleep: []
+    };
   }
+};
+
+export const clearValue = (section: keyof AppState): AppState[keyof AppState] => {
+  const state = loadState();
+  state[section] = [];
+  saveState(state);
+  return state[section];
 };

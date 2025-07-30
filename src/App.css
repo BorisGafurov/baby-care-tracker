@@ -26,6 +26,7 @@ section {
   padding: 16px;
   background: #f9f9f9;
   border-radius: 8px;
+  
 }
 
 section h2 {
@@ -46,6 +47,7 @@ button {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin-bottom: 15px;
 }
 
 button:hover {

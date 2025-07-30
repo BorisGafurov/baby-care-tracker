@@ -21,12 +21,19 @@ const feedingSlice = createSlice({
         state.push({ startTime: now, endTime: null, duration: null });
       }
     },
+
+    setFeedings: (state, action) => {
+      return action.payload;
+    }
   },
 });
 
+
 function calculateDuration(start: string, end: string): number {
-  return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
+  const timeMin = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
+
+  return timeMin < 60 ? timeMin / 60 : timeMin;
 }
 
-export const { toggleFeedingEntry } = feedingSlice.actions;
+export const { toggleFeedingEntry, setFeedings } = feedingSlice.actions;
 export default feedingSlice.reducer;
