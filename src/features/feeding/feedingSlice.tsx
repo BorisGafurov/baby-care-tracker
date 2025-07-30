@@ -1,16 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
-
-export interface FeedingEntry {
-  startTime: string;
-  endTime: string | null;
-  duration: number | null;
-}
+import { createSlice} from '@reduxjs/toolkit';
 
 interface DurationResult {
   hours: number;
   minutes: number;
   totalMinutes: number;
   formatted: string;
+}
+
+
+export interface FeedingEntry {
+  startTime: string;
+  endTime: string | null;
+  duration: number | null;
 }
 
 const feedingSlice = createSlice({
@@ -23,10 +24,18 @@ const feedingSlice = createSlice({
 
       if (lastEntry && !lastEntry.endTime) {
         lastEntry.endTime = now;
-        const duration = calculateDuration(lastEntry.startTime, now);
-        lastEntry.duration = duration.totalMinutes;
+        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
       } else {
         state.push({ startTime: now, endTime: null, duration: null });
+      }
+    },
+    forceEndFeeding: (state) => {
+      const lastEntry = state[state.length - 1];
+      const now = new Date().toISOString();
+      
+      if (lastEntry && !lastEntry.endTime) {
+        lastEntry.endTime = now;
+        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
       }
     },
 
@@ -69,5 +78,5 @@ export function calculateDuration(start: string, end: string): DurationResult {
   };
 }
 
-export const { toggleFeedingEntry, setFeedings } = feedingSlice.actions;
+export const { toggleFeedingEntry, setFeedings, forceEndFeeding } = feedingSlice.actions;
 export default feedingSlice.reducer;

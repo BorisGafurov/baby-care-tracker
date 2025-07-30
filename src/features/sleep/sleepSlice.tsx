@@ -23,12 +23,21 @@ const sleepSlice = createSlice({
 
       if (lastEntry && !lastEntry.endTime) {
         lastEntry.endTime = now;
-        const duration = calculateDuration(lastEntry.startTime, now);
-        lastEntry.duration = duration.totalMinutes;
+        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
       } else {
         state.push({ startTime: now, endTime: null, duration: null });
       }
     },
+    forceEndSleep: (state) => {
+      const lastEntry = state[state.length - 1];
+      const now = new Date().toISOString();
+      
+      if (lastEntry && !lastEntry.endTime) {
+        lastEntry.endTime = now;
+        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
+      }
+    },
+
     setSleeps: (state, action) => {
       return action.payload;
     }
@@ -67,5 +76,5 @@ export function calculateDuration(start: string, end: string): DurationResult {
   };
 }
 
-export const { toggleSleepEntry, setSleeps } = sleepSlice.actions;
+export const { toggleSleepEntry, setSleeps, forceEndSleep } = sleepSlice.actions;
 export default sleepSlice.reducer;

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleFeedingEntry, setFeedings } from './features/feeding/feedingSlice';
-import { toggleSleepEntry, setSleeps } from './features/sleep/sleepSlice';
+import { toggleFeedingEntry, setFeedings, forceEndFeeding } from './features/feeding/feedingSlice';
+import { toggleSleepEntry, setSleeps, forceEndSleep } from './features/sleep/sleepSlice';
 import './App.css';
 import type { RootState } from './app/store';
 import {clearValue, loadState} from './utils/localStorage';
@@ -18,6 +18,20 @@ function App() {
     dispatch(setSleeps(savedState.sleep));
   }, [dispatch]);
 
+  const handleStartFeeding = () => {
+    if (sleepEntries.some(entry => !entry.endTime)) {
+      dispatch(forceEndSleep());
+    }
+    dispatch(toggleFeedingEntry());
+  };
+
+  const handleStartSleep = () => {
+    if (feedingEntries.some(entry => !entry.endTime)) {
+      dispatch(forceEndFeeding());
+    }
+    dispatch(toggleSleepEntry());
+  };
+
   const clearFeedingsHandler = () => {
     const updatedFeedings = clearValue('feeding');
     dispatch(setFeedings(updatedFeedings));
@@ -33,7 +47,7 @@ function App() {
     <div className="App">
       <section>
         <h2>Кормление</h2>
-        <button onClick={() => dispatch(toggleFeedingEntry())}>
+        <button onClick={handleStartFeeding}>
           {feedingEntries.length && !feedingEntries[feedingEntries.length - 1].endTime
             ? 'Завершить кормление'
             : 'Начать кормление'}
@@ -57,7 +71,7 @@ function App() {
       </section>
       <section>
         <h2>Сон</h2>
-        <button onClick={() => dispatch(toggleSleepEntry())}>
+        <button onClick={handleStartSleep}>
           {sleepEntries.length && !sleepEntries[sleepEntries.length - 1].endTime
             ? 'Завершить сон'
             : 'Начать сон'}
