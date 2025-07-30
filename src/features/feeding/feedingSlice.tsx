@@ -6,6 +6,13 @@ export interface FeedingEntry {
   duration: number | null;
 }
 
+interface DurationResult {
+  hours: number;
+  minutes: number;
+  totalMinutes: number;
+  formatted: string;
+}
+
 const feedingSlice = createSlice({
   name: 'feeding',
   initialState: [] as FeedingEntry[],
@@ -16,7 +23,8 @@ const feedingSlice = createSlice({
 
       if (lastEntry && !lastEntry.endTime) {
         lastEntry.endTime = now;
-        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
+        const duration = calculateDuration(lastEntry.startTime, now);
+        lastEntry.duration = duration.totalMinutes;
       } else {
         state.push({ startTime: now, endTime: null, duration: null });
       }
@@ -29,10 +37,36 @@ const feedingSlice = createSlice({
 });
 
 
-function calculateDuration(start: string, end: string): number {
-  const timeMin = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
-
-  return timeMin < 60 ? timeMin / 60 : timeMin;
+export function calculateDuration(start: string, end: string): DurationResult {
+  const totalMinutes = Math.round(
+    (new Date(end).getTime() - new Date(start).getTime()) / 60000
+  );
+  
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  let formatted: string;
+  
+  if (totalMinutes < 60) {
+    formatted = `${totalMinutes} мин`;
+  } else {
+    formatted = `${hours} ч ${minutes} мин`;
+    
+    if (hours === 1) {
+      formatted = `${hours} час ${minutes} мин`;
+    } else if (hours >= 2 && hours <= 4) {
+      formatted = `${hours} часа ${minutes} мин`;
+    } else {
+      formatted = `${hours} часов ${minutes} мин`;
+    }
+  }
+  
+  return {
+    hours,
+    minutes,
+    totalMinutes,
+    formatted
+  };
 }
 
 export const { toggleFeedingEntry, setFeedings } = feedingSlice.actions;

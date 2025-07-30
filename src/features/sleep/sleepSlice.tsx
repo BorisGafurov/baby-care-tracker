@@ -6,6 +6,13 @@ export interface SleepEntry {
   duration: number | null;
 }
 
+interface DurationResult {
+  hours: number;
+  minutes: number;
+  totalMinutes: number;
+  formatted: string;
+}
+
 const sleepSlice = createSlice({
   name: 'sleep',
   initialState: [] as SleepEntry[],
@@ -16,7 +23,8 @@ const sleepSlice = createSlice({
 
       if (lastEntry && !lastEntry.endTime) {
         lastEntry.endTime = now;
-        lastEntry.duration = calculateDuration(lastEntry.startTime, now);
+        const duration = calculateDuration(lastEntry.startTime, now);
+        lastEntry.duration = duration.totalMinutes;
       } else {
         state.push({ startTime: now, endTime: null, duration: null });
       }
@@ -27,8 +35,36 @@ const sleepSlice = createSlice({
   },
 });
 
-function calculateDuration(start: string, end: string): number {
-  return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
+export function calculateDuration(start: string, end: string): DurationResult {
+  const totalMinutes = Math.round(
+    (new Date(end).getTime() - new Date(start).getTime()) / 60000
+  );
+  
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  let formatted: string;
+  
+  if (totalMinutes < 60) {
+    formatted = `${totalMinutes} мин`;
+  } else {
+    formatted = `${hours} ч ${minutes} мин`;
+    
+    if (hours === 1) {
+      formatted = `${hours} час ${minutes} мин`;
+    } else if (hours >= 2 && hours <= 4) {
+      formatted = `${hours} часа ${minutes} мин`;
+    } else {
+      formatted = `${hours} часов ${minutes} мин`;
+    }
+  }
+  
+  return {
+    hours,
+    minutes,
+    totalMinutes,
+    formatted
+  };
 }
 
 export const { toggleSleepEntry, setSleeps } = sleepSlice.actions;

@@ -5,6 +5,7 @@ import './App.css';
 import type { RootState } from './app/store';
 import {clearValue, loadState} from './utils/localStorage';
 import { useEffect } from 'react';
+import { calculateDuration } from './features/feeding/feedingSlice';
 
 function App() {
   const dispatch = useDispatch();
@@ -40,11 +41,17 @@ function App() {
         <button onClick={clearFeedingsHandler}>Сбросить кормление</button>
         <ul>
           {feedingEntries.map((entry, i) => (
-            <li key={i}>
-              {new Date(entry.startTime).toLocaleTimeString()} -{" "}
-              {entry.endTime ? new Date(entry.endTime).toLocaleTimeString() : "Продолжается"}{" "}
-              ({entry.duration} мин)
-            </li>
+          <li key={i}>
+          {new Date(entry.startTime).toLocaleTimeString()} -{" "}
+          {entry.endTime ? (
+            <>
+              {new Date(entry.endTime).toLocaleTimeString()} (
+              {calculateDuration(entry.startTime, entry.endTime).formatted})
+            </>
+          ) : (
+            "Продолжается"
+          )}
+        </li>
           ))}
         </ul>
       </section>
@@ -59,10 +66,16 @@ function App() {
         <ul>
           {sleepEntries.map((entry, i) => (
             <li key={i}>
-              {new Date(entry.startTime).toLocaleTimeString()} -{" "}
-              {entry.endTime ? new Date(entry.endTime).toLocaleTimeString() : "Продолжается"}{" "}
-              ({entry.duration} мин)
-            </li>
+            {new Date(entry.startTime).toLocaleTimeString()} -{" "}
+            {entry.endTime ? (
+              <>
+                {new Date(entry.endTime).toLocaleTimeString()} (
+                {calculateDuration(entry.startTime, entry.endTime).formatted})
+              </>
+            ) : (
+              "Продолжается"
+            )}
+          </li>
           ))}
         </ul>
       </section>
